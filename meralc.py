@@ -108,17 +108,25 @@ def cearling_all_links(url, cookies=None):
     try:
         re = requests.get(url=url, headers=headers, cookies=cookies)
         re.raise_for_status()  # Ensure we handle unsuccessful responses
-        soup = BeautifulSoup(re.text, 'html.parser')
+        re.encoding = 'utf-8'
+        try:
+            soup = BeautifulSoup(re.text, 'html.parser')
+        except Exception as e:
+            # If 'html.parser' fails, try 'lxml'
+            print(f"Error with 'html.parser': {e}, switching to 'lxml'")
+            soup = BeautifulSoup(re.text, 'lxml')
         for link in soup.find_all('a'):
-            href = link.get('href') 
-            if href: 
+            href = link.get('href')
+            if href:
                 full_url = urljoin(url, href)
                 urls.append(full_url)
         for link in soup.find_all('link'):
-            href = link.get('href') 
-            if href: 
+            href = link.get('href')
+            if href:
                 full_url = urljoin(url, href)
                 urls.append(full_url)
+    except Exception as e:
+        print(f"General error during parsing: {e}")
     except requests.exceptions.RequestException as e:
         pass
     return urls
