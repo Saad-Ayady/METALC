@@ -150,7 +150,7 @@ def unaq(lines) :
 
     return result
 
-def fulter_link(ur, cookies=None) :
+def fulter_link(url, cookies=None) :
     url = cearling_all_links(url, cookies=cookies)
     urls= []
     c = []
@@ -239,14 +239,14 @@ def main():
             print(f"{red}{bold_text}[URL NOT WORKING]{res_bold_text}")
             os.exit(1)
         print(panel)
-        print(f"\n{bold_text}{yellow}[{red}Crawlink HMTL link{yellow}]{res_bold_text}")
+        print(f"\n{bold_text}{yellow}[{red}Crawling HMTL link{yellow}]{res_bold_text}")
         print(f"{blue}{bold_text}--------------------{res_bold_text}")
         x = fulter_link(url, cookies)
         if args.output:
             save_links_to_file(x, args.output)
         for xs in x :
             print(xs)
-        print(f"\n{bold_text}{yellow}[{red}Crawlink JS link{yellow}]{res_bold_text}")
+        print(f"\n{bold_text}{yellow}[{red}Crawling JS link{yellow}]{res_bold_text}")
         print(f"{blue}{bold_text}--------------------{res_bold_text}")
         j = allJs(url, cookies)
         if args.output:
@@ -260,10 +260,10 @@ def main():
                 word_list = args.word
             else :
                 print(f"{bold_text}{red}Ur WordList Not Fond i Use MY word list{res_bold_text}")
-                word_list = ".word.txt"
+                word_list = "src/.word.txt"
         else :
-            word_list = ".word.txt"
-        print(f"\n{bold_text}{yellow}[{red}Crawlink brud_fors link{yellow}]{res_bold_text}")
+            word_list = "src/.word.txt"
+        print(f"\n{bold_text}{yellow}[{red}Crawling brud_fors link{yellow}]{res_bold_text}")
         print(f"{bold_text}{blue}---------------------------{res_bold_text}")
         if args.output:
             print_Work(f"{url}FUZZINTHISPARTPLZ",word_list, True, args.output, cookies)
