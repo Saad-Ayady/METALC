@@ -44,12 +44,6 @@ panel = (f"""{bold_text}
 ⠀⣼⠟⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠻⣧⠀
 ⠜⠃⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠳
     {res_bold_text}""")
-def check_is_run(url, cookies=None) -> None:
-    try :
-        re = requests.get(url=url, headers=headers, cookies=cookies)
-        return 1
-    except:
-        return 0
 
 def read_file_lines(file_path):
     lines = []
@@ -113,7 +107,7 @@ def print_Work(url, word, isSave, filename, cookies=None):
             if sc:
                 print(f"{li} [{sc}]")
                 if isSave:
-                    file.write(f"{li}\n")
+                    file.write(f"{li} [{sc}]\n")
 
     except Exception as e:
         print(f"Error saving to file: {e}")
@@ -250,9 +244,6 @@ def main():
     
     if args.url:
         url = args.url
-        if check_is_run(url, cookies) != 1 :
-            print(f"{red}{bold_text}[URL NOT WORKING]{res_bold_text}")
-            os.exit(1)
         print(panel)
         print(f"\n{bold_text}{yellow}[{red}Crawling HMTL link{yellow}]{res_bold_text}")
         print(f"{blue}{bold_text}--------------------{res_bold_text}")
