@@ -6,7 +6,7 @@ from colorama import Fore, Style, init
 import sys
 import argparse
 import os
-
+import threading
 
 user_agent_string = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:109.0) Gecko/20100101 Firefox/113.0"
 headers: dict[str, str] = {'User-Agent': user_agent_string}
@@ -75,33 +75,52 @@ def creat_urls_to_bred_fors(url, wordList) :
         uarr.append(newURL)
     return uarr
 
+
+import threading
+import requests
+
+# Function to check a URL and update the dictionary with the status code
+def check_url(i, cookies, dec_url, headers=None):
+    try:
+        headers = headers or {}  # Use default headers if none are provided
+        response = requests.get(url=i, headers=headers, cookies=cookies)
+        dec_url[i] = response.status_code  # Save status code in the dictionary
+    except Exception as e:
+        pass
+
+# Main function to create threads for brute-forcing URLs
 def brud_fors(url: str, wordList: str, cookies=None):
+    # Function to generate URLs for brute-forcing (assumed to be implemented)
     urls = creat_urls_to_bred_fors(url=url, wordList=wordList)
     if not urls:
         return {}
-    dec_url = {}      
+    dec_url = {}
+    threads = []
     for i in urls:
-        try:
-            re = requests.get(url=i, headers=headers, cookies=cookies)
-            dec_url[i] = re.status_code
-        except Exception as e:
-            continue
+        thread = threading.Thread(target=check_url, args=(i, cookies, dec_url))
+        threads.append(thread)
+        thread.start()
+    for thread in threads:
+        thread.join()
     return dec_url
 
 def print_Work(url, word, isSave, filename, cookies=None):
     links = brud_fors(url, word, cookies=cookies)
-    if isSave:
-        try:
-            with open(filename, 'w') as file:
-                for li, sc in links.items():
-                    file.write(f"{li} [{sc}]\n")
-        except Exception as e:
-            print(f"Error saving to file: {e}")
-    else:
-        # If isSave is False, just print the links
-        for li, sc in links.items():
-            print(f"{li} [{sc}]")
+    try:
+        file = open(filename, 'a') if isSave else None
 
+        for li, sc in links.items():
+            if sc:
+                print(f"{li} [{sc}]")
+                if isSave:
+                    file.write(f"{li}\n")
+
+    except Exception as e:
+        print(f"Error saving to file: {e}")
+    
+    finally:
+        if isSave and file:
+            file.close()
 
 def cearling_all_links(url, cookies=None):
     urls = []
@@ -112,7 +131,6 @@ def cearling_all_links(url, cookies=None):
         try:
             soup = BeautifulSoup(re.text, 'html.parser')
         except Exception as e:
-            # If 'html.parser' fails, try 'lxml'
             print(f"Error with 'html.parser': {e}, switching to 'lxml'")
             soup = BeautifulSoup(re.text, 'lxml')
         for link in soup.find_all('a'):
@@ -125,11 +143,12 @@ def cearling_all_links(url, cookies=None):
             if href:
                 full_url = urljoin(url, href)
                 urls.append(full_url)
+        return urls
     except Exception as e:
         print(f"General error during parsing: {e}")
+        return []
     except requests.exceptions.RequestException as e:
-        pass
-    return urls
+        return []
 
 def get_js_links(url, cookies=None):
     try:
@@ -193,25 +212,13 @@ def allJs(url, cookies=None) :
             all_re.append(cs)
     return all_re
 
-# print("[Crawlink HMTL link]")
-# x = fulter_link("https://myaccount.google.com/?pli=1")
-# for xs in x :
-#     print(xs)
-# print("[Crawlink JS link]")
-# j = allJs("https://myaccount.google.com/?pli=1")
-# for xs in j :
-#     print(xs)
-# print("[Crawlink brud_fors link]")
-# print_Work("https://myaccount.google.com/FUZZINTHISPARTPLZ",".word.txt")
 
-# color_text("red", "said")
 
 def save_links_to_file(links, filename):
     try:
         with open(filename, 'a') as file:
             for link in links:
                 file.write(link + '\n')
-        print(f"{bold_text}{green}[Links saved to {filename}]{res_bold_text}")
     except Exception as e:
         print(f"{red}{bold_text}Error saving to file: {e}{res_bold_text}")
 
